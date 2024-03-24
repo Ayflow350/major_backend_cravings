@@ -1,11 +1,13 @@
 const express = require("express");
 const authsRoutes = require("./routes/auths.js");
+
 const passport = require('passport');
 const session = require('express-session');
 const { Strategy: GoogleStrategy } = require('passport-google-oauth20');
 
 
 const authRoutes = require("./routes/auth.js");
+const productsRoutes = require("./routes/products.js");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -58,6 +60,8 @@ mongoose
     app.use("/auths", authsRoutes);
   
     app.use("/auth", authRoutes);
+
+    app.use("/products", productsRoutes);
 
     passport.use(
       new GoogleStrategy(
