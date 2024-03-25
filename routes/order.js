@@ -1,64 +1,99 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const express = require("express");
+const router = express.Router();
+const Order = require("../model/OrderModel");
 
-const orderSchema = new Schema({
-  price: {
-    type: Number,
-    required: true
-  },
-  deliveryFee: {
-    type: Number,
-    required: true
-  },
-  quantity: [{
-    item: { type: String, required: true },
-    quantity: { type: Number, required: true }
-  }],
-  name: {
-    type: String,
-    required: true
-  },
-  totalFee: {
-    type: Number,
-    required: true
-  },
-  delivered: {
-    type: Boolean,
-    default: false
-  },
-  completed: {
-    type: Boolean,
-    default: true
-  },
-  orderId: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  deliveryPin: {
-    type: String,
-    required: true,
-    minlength: 4,
-    maxlength: 4
+const uuid = require("uuid");
+
+router.post("/", async (req, res) => {
+  try {
+    // Generate UUID for the order ID
+    const orderId = "#" + uuid.v4().substring(0, 7);
+
+    // Generate a random four-digit pin for the delivery pin
+    const deliveryPin = Math.floor(1000 + Math.random() * 9000).toString();
+
+    // Add the generated order ID and delivery pin to the request body
+    req.body.orderId = orderId;
+    req.body.deliveryPin = deliveryPin;
+
+    const order = new Order(req.body);
+    await order.save();
+    res.status(201).json(order);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 });
 
-// Pre-save hook to generate order ID with hash and random digits
-orderSchema.pre("save", function(next) {
-  if (!this.orderId) {
-    const hash = "#";
-    const randomDigits = Math.floor(1000000 + Math.random() * 9000000); // Generates 7 random digits
-    this.orderId = hash + randomDigits.toString();
+// Get all orders
+router.get("/", async (req, res) => {
+  try {
+    const orders = await Order.find();
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-  // Check if deliveryPin is not already generated
-  if (!this.deliveryPin) {
-    const randomPin = Math.floor(1000 + Math.random() * 9000); // Generates 4 random digits
-    this.deliveryPin = randomPin.toString();
+});
+
+// Get a single order
+router.get("/:id", getOrder, async (req, res) => {
+  try {
+    const orderId = req.params.id.trim(); // Remove potential whitespace
+    const order = await Order.findById(orderId).lean();
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.json(order);
+  } catch (err) {
+    console.error(err); // Log for debugging
+    res.status(500).json({ error: "Something went wrong" });
   }
+});
+
+// Update an order
+router.put("/:id", getOrder, async (req, res) => {
+  try {
+    Object.assign(res.order, req.body);
+    await res.order.save();
+    res.json(res.order);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Delete an order
+router.delete("/:id", async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    const deletedOrder = await Order.findByIdAndDelete(orderId);
+
+    if (!deletedOrder) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.json({ message: "Order deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+// Middleware to fetch order by ID
+async function getOrder(req, res, next) {
+  let order;
+  try {
+    order = await Order.findById(req.params.id);
+    if (order == null) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+
+  res.order = order;
   next();
-});
+}
 
-const Order = mongoose.model("Order", orderSchema);
-
-module.exports = Order;
+module.exports = router;
 
