@@ -8,6 +8,7 @@ const { Strategy: GoogleStrategy } = require('passport-google-oauth20');
 
 const authRoutes = require("./routes/auth.js");
 const productsRoutes = require("./routes/products.js");
+const OrderRoutes = require("./routes/order.js");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
@@ -58,6 +59,9 @@ mongoose
 
 
     app.use("/auths", authsRoutes);
+   
+
+    app.use("/order", OrderRoutes);
   
     app.use("/auth", authRoutes);
 

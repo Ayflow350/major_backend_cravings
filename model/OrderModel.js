@@ -11,9 +11,9 @@ const orderSchema = new Schema({
     required: true
   },
   quantity: {
-    type: Number,
+    type: [String], // Changed to an array of strings
     required: true
-  },
+},
   name: {
     type: String,
     required: true
