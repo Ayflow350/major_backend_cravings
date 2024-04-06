@@ -18,7 +18,7 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  items: {
+  contentItems: {
     type: [String],
     required: true
   },
@@ -27,7 +27,7 @@ const productSchema = new mongoose.Schema({
     required: true
   },
   foodPicture: {
-    type: String, // Assuming you'll store a URL to the image
+    type: String, 
     required: true
   }
 });
