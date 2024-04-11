@@ -18,12 +18,17 @@ const orderSchema = new Schema({
     required: true
   },
   quantity: [{
-    item: { type: String, required: true },
+    item: {
+      type: String,
+      required: true,
+      minlength: 3 // Minimum length of 3 characters for item name
+    },
     quantity: { type: Number, required: true }
   }],
   name: {
     type: String,
-    required: true
+    required: true,
+    minlength: 3 // Minimum length of 3 characters for name
   },
   totalFee: {
     type: Number,
@@ -46,6 +51,13 @@ const orderSchema = new Schema({
   deliveryPin: {
     type: String,
     required: true
+  },
+  createdAt: { // Timestamp for order creation
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: { // Optional timestamp for order updates
+    type: Date
   }
 });
 
@@ -57,6 +69,10 @@ orderSchema.pre("save", function(next) {
   }
   next();
 });
+
+// Define indexes (optional)
+orderSchema.index({ user: 1 }); // Index on user field
+orderSchema.index({ delivered: 1 }); // Index on delivered field (if frequently queried)
 
 // Create the Order model
 const Order = mongoose.model("Order", orderSchema);

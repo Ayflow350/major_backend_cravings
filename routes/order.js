@@ -14,17 +14,26 @@ function validateUserId(req, res, next) {
 
 router.post("/", validateUserId, async (req, res) => {
   try {
+    const userId = req.body.user._id; // Extract the ObjectId from the user object
+
     // Generate UUID for the order ID
     const orderId = "#" + uuid.v4().substring(0, 7);
 
     // Generate a random four-digit pin for the delivery pin
     const deliveryPin = Math.floor(1000 + Math.random() * 9000).toString();
 
-    // Add the generated order ID and delivery pin to the request body
-    req.body.orderId = orderId;
-    req.body.deliveryPin = deliveryPin;
+    const orderData = {
+      user: userId, // Use the extracted ObjectId
+      price: req.body.price,
+      deliveryFee: req.body.deliveryFee,
+      quantity: req.body.quantity,
+      name: req.body.name,
+      totalFee: req.body.totalFee,
+      orderId,
+      deliveryPin,
+    };
 
-    const order = new Order(req.body);
+    const order = new Order(orderData);
     await order.save();
     res.status(201).json(order);
   } catch (err) {
