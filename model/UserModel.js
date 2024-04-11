@@ -3,7 +3,7 @@ const { Schema } = mongoose;
 
 // Custom validator function to check if the phone number has exactly 9 digits
 const validatePhoneNumber = function(phoneNumber) {
-  const phoneNumberRegex = /^\d{9}$/;
+  const phoneNumberRegex = /^\d{11}$/;
   return phoneNumberRegex.test(phoneNumber);
 };
 
@@ -28,7 +28,7 @@ const userSchema = new Schema({
     required: true,
     validate: {
       validator: validatePhoneNumber,
-      message: "Phone number must have exactly 9 digits",
+      message: "Phone number must have exactly 11 digits",
     },
   },
 });
