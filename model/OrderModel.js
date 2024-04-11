@@ -4,6 +4,11 @@ const { v4: uuidv4 } = require('uuid');
 
 // Define the order schema
 const orderSchema = new Schema({
+  user: { // Reference to the user who placed the order
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   price: {
     type: Number,
     required: true
@@ -57,3 +62,4 @@ orderSchema.pre("save", function(next) {
 const Order = mongoose.model("Order", orderSchema);
 
 module.exports = Order;
+

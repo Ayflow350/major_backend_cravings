@@ -4,7 +4,15 @@ const Order = require("../model/OrderModel");
 
 const uuid = require("uuid");
 
-router.post("/", async (req, res) => {
+// Middleware to check if user ID is sent with the request body
+function validateUserId(req, res, next) {
+  if (!req.body.user || !req.body.user._id) {
+    return res.status(400).json({ error: "User ID is required" });
+  }
+  next();
+}
+
+router.post("/", validateUserId, async (req, res) => {
   try {
     // Generate UUID for the order ID
     const orderId = "#" + uuid.v4().substring(0, 7);
