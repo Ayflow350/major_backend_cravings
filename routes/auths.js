@@ -18,8 +18,8 @@ router.post(
     .withMessage("The password is invalid"),
   body("name").notEmpty().withMessage("Name is required"),
   body("phoneNumber")
-    .isLength({ min: 9, max: 9 })
-    .withMessage("Phone number must have exactly 9 digits")
+    .isLength({ min: 11, max: 11 })
+    .withMessage("Phone number must have exactly 11 digits")
     .isNumeric()
     .withMessage("Phone number must contain only digits"),
   async (req, res) => {
