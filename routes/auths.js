@@ -20,8 +20,8 @@ router.post(
   body("phoneNumber")
     .isLength({ min: 11, max: 11 })
     .withMessage("Phone number must have exactly 11 digits")
-    .isNumeric()
-    .withMessage("Phone number must contain only digits"),
+    .isNumeric(),
+    
   async (req, res) => {
     const validationErrors = validationResult(req);
 
